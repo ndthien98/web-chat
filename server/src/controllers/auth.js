@@ -14,7 +14,7 @@ const login = async (req, res, next) => {
   const { username, password } = req.body
   const existed = await authService.checkExist(username);
   if (!existed) {
-    next('Tài khoản không tồn tại!')
+    req.notifyFail('Tài khoản không tồn tại!')
   } else {
     const encryptPassword = await authService.getEncryptPassword(username)
     const rs = await security.verifyPassword(password, encryptPassword)
@@ -31,7 +31,7 @@ const login = async (req, res, next) => {
         token
       })
     } else {
-      next('Đăng nhập thất bại!')
+      req.notifyFail('Đăng nhập thất bại!')
     }
   }
 }
@@ -45,20 +45,20 @@ const changePassword = async (req, res, next) => {
     req.notifySuccess('Đổi mật khẩu thành công!')
     return
   }
-  next('Đổi mật khẩu thất bại!')
+  req.notifyFail('Đổi mật khẩu thất bại!')
 }
 
 const register = async (req, res, next) => {
   const { username, password, displayname, birthday, gender, phone } = req.body
   if (await authService.checkExist(username)) {
-    next('Tài khoản đã tồn tại!');
+    req.notifyFail('Tài khoản đã tồn tại!');
   } else {
     const encryptPassword = await security.generatePassword(password)
     const rs = await authService.createAccount({ username, password: encryptPassword, displayname, birthday, gender, phone });
     if (rs) {
       req.notifySuccess('Tạo tài khoản thành công')
     } else {
-      next('Tạo tài khoản thất bại!');
+      req.notifyFail('Tạo tài khoản thất bại!');
     }
   }
 }

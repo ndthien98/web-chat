@@ -14,7 +14,7 @@ export default class Register extends Component {
       username: '',
       password: '',
       displayname: '',
-      birthday: '',
+      birthday: null,
       phone: '',
       gender: ''
     }
@@ -23,6 +23,7 @@ export default class Register extends Component {
     this.setState({
       [e.target.name]: e.target.value
     })
+    console.log(this.state.birthday)
   }
   handleBack = async () => {
     this.history.goBack()
@@ -82,7 +83,7 @@ export default class Register extends Component {
           name="birthday"
           type="date"
           onChange={this.handleChange}
-          value={this.state.birthday || ''}
+          value={this.state.birthday}
         />
         <Button
           style={styles.input}

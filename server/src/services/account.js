@@ -11,6 +11,7 @@ const createAccount = async (username, displayname, birthday, gender, phone) => 
   await db.queryNone(sqlAccount, [userid, displayname, birthday, gender, phone])
   return true;
 }
+
 const getAccountByUsername = async (username) => {
   const sql = `SELECT * FROM account WHERE username = ?;`
   const account = await db.queryOne(sql, [username]);

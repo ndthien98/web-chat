@@ -1,8 +1,8 @@
 const io = require('socket.io')
 const express = require('express')
 const http = require('http')
-// sockets
 const messageSocket = require('./sockets/message')
+
 // middlewares
 const JSONBodyParser = require('body-parser').json()
 const corsMiddlware = require('cors')()
@@ -12,9 +12,11 @@ const notifyFail = require('./middlewares/success').notifyFail
 const logger = require('./middlewares/logger')
 require('dotenv').config()
 require('./utils/mysqldb')
+
 // routers
 const authRouter = require('./routers/auth')
 const accountRouter = require('./routers/account')
+
 // Initialized RESTful API
 const app = express()
 const server = http.createServer(app)
@@ -49,6 +51,7 @@ var socketServer = (function () {
   };
 })();
 
+// use Message Socket
 messageSocket(socketServer.getInstance());
 
 const PORT = process.env.PORT || 5000
