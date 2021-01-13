@@ -1,4 +1,4 @@
-const db = require('../utils/mysqldb')
+const db = require('../../utils/mysqldb')
 
 const checkExist = async (username) => {
   const sql = `SELECT username FROM account WHERE username = ?;`

@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const authController = require('../controllers/auth')
-const tryCatch = require('../middlewares/errorHandle').tryCatch
-const validators = require('../middlewares/validators')
-const auth = require('../middlewares/auth')
+const authController = require('./authController')
+const tryCatch = require('../../middlewares/errorHandle').tryCatch
+const validators = require('../../middlewares/validators')
+const auth = require('../../middlewares/auth')
 const { body } = require('express-validator')
 
 router.get('/current',
@@ -28,16 +28,11 @@ router.post('/change-password',
     if (value === req.body.repassword)
       return true
     else {
-      throw new Error('Password confirmation does not match password')
+      req.notifyFail('Xác nhận mật khẩu không khớp')
     }
   }),
   validators('password', 'newpassword', 'repassword'),
   tryCatch(authController.changePassword)
 )
-
-// router.post('/refresh-token',
-//   validators('token', 'refreshToken'),
-//   tryCatch(authController.refreshToken)
-// )
 
 module.exports = router

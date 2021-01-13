@@ -14,8 +14,6 @@ require('dotenv').config()
 require('./utils/mysqldb')
 
 // routers
-const authRouter = require('./routers/auth')
-const accountRouter = require('./routers/account')
 
 // Initialized RESTful API
 const app = express()
@@ -26,12 +24,14 @@ app.use(notifySuccess)
 app.use(notifyFail)
 app.use(logger)
 
+const routers = require('./features')
 app.get('/api', (req, res) => res.send('API running'))
-app.use('/api/auth', authRouter)
-app.use('/api/account', accountRouter)
+routers.forEach(e => {
+  app.use(e.path, e.router)
+})
 
 app.use(catchException)
-app.use('*', (req, res) => { req.notifyFail('Unknown link') })
+app.use('*', (req, res) => { req.notifyFail('Unknown router: ' + req.originalUrl) })
 
 // Initialized Socket Server 
 var socketServer = (function () {
@@ -54,6 +54,7 @@ var socketServer = (function () {
 // use Message Socket
 messageSocket(socketServer.getInstance());
 
+// start server 
 const PORT = process.env.PORT || 5000
 server.listen(PORT, (e) => {
   if (e) console.log('Error while start server:', e)

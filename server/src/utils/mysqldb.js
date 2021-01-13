@@ -5,11 +5,12 @@ const pool = mysql.createPool(MYSQL_URL);
 const logMySQLQuerry = (sql, params) => {
   console.log('SQL: ',
     mysql.format(sql, params)
-      .replace(/\r?\n|\r/g, ' ') 
+      .replace(/\r?\n|\r/g, ' ')
       .split(' ').filter(e => e !== '').join(' '));
 }
 
 pool.query('SELECT * FROM 1==1'); // test connection 
+
 pool.on('connection', function (connection) {
   console.log('Connected to mysql db ' + MYSQL_URL);
 });
@@ -67,10 +68,42 @@ const queryNone = async (sql, params, transaction) => {
   });
 };
 
+// Transaction 
 
+// connection.beginTransaction(function (err) {
+//   if (err) { throw err; }
+//   connection.query('INSERT INTO posts SET title=?', title, function (error, results, fields) {
+//     if (error) {
+//       return connection.rollback(function () {
+//         throw error;
+//       });
+//     }
+
+//     var log = 'Post ' + results.insertId + ' added';
+
+//     connection.query('INSERT INTO log SET data=?', log, function (error, results, fields) {
+//       if (error) {
+//         return connection.rollback(function () {
+//           throw error;
+//         });
+//       }
+//       connection.commit(function (err) {
+//         if (err) {
+//           return connection.rollback(function () {
+//             throw err;
+//           });
+//         }
+//         console.log('success!');
+//       });
+//     });
+//   });
+// });
+
+const getConnection = async () => await pool.getConnection()
 
 module.exports = {
   queryNone,
   queryOne,
-  queryMulti
+  queryMulti,
+  getConnection,
 }

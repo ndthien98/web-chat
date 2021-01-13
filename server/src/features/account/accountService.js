@@ -1,4 +1,4 @@
-const db = require('../utils/mysqldb')
+const db = require('../../utils/mysqldb')
 
 const createAccount = async (username, displayname, birthday, gender, phone) => {
   const sqlAuth = `
@@ -11,7 +11,6 @@ const createAccount = async (username, displayname, birthday, gender, phone) => 
   await db.queryNone(sqlAccount, [userid, displayname, birthday, gender, phone])
   return true;
 }
-
 const getAccountByUsername = async (username) => {
   const sql = `SELECT * FROM account WHERE username = ?;`
   const account = await db.queryOne(sql, [username]);
@@ -30,8 +29,22 @@ const updateAccountByUsername = async ({ username, displayname, birthday, gender
   `;
   await db.queryNone(sql, [displayname, new Date(birthday), gender, phone, username])
 }
+
+const findAccount = async (keyword) => {
+  const sql = `
+  SELECT * FROM account 
+  WHERE username LIKE ? OR displayname LIKE ?; 
+  `
+  const accounts = await db.queryMulti(sql, [`%${keyword}%`, `%${keyword}%`])
+  accounts.forEach((_, i) => {
+    delete accounts[i].password
+  });
+  return accounts
+}
+
 module.exports = {
   createAccount,
   getAccountByUsername,
-  updateAccountByUsername
+  updateAccountByUsername,
+  findAccount
 }

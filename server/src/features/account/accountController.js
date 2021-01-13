@@ -1,4 +1,4 @@
-const accountService = require('../services/account')
+const accountService = require('./accountService')
 
 const getAccountByUsername = async (req, res, next) => {
   const username = req.params.username
@@ -9,30 +9,26 @@ const getAccountByUsername = async (req, res, next) => {
     data: account
   })
 }
-const getUsersFriends = async (req, res, next) => {
-  res.send(`get user's friend `)
-}
+
 const updateAccountByUsername = async (req, res, next) => {
   const { username } = req.auth
   const { displayname, birthday, gender, phone } = req.body
   await accountService.updateAccountByUsername({ username, displayname, birthday, gender, phone })
   req.notifySuccess()
 }
-const lockAccountByUsername = async (req, res, next) => {
-  res.send('lockAccountByUsername')
+const findAccount = async (req, res, next) => {
+  const keyword = req.query.keyword
+  console.log(keyword)
+  const account = await accountService.findAccount(keyword)
+  res.send({
+    status: 1,
+    data: account
+  })
 }
-const requestFriend = async (req, res, next) => {
-  res.send('requestFriend')
-}
-const acceptFriend = async (req, res, next) => {
-  res.send('acceptFriend')
-}
+
 
 module.exports = {
   getAccountByUsername,
-  getUsersFriends,
   updateAccountByUsername,
-  lockAccountByUsername,
-  requestFriend,
-  acceptFriend
+  findAccount,
 }

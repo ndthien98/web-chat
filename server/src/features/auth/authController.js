@@ -1,6 +1,6 @@
-const authService = require('../services/auth')
-const accountService = require('../services/account')
-const security = require('../utils/security')
+const authService = require('./authService')
+const accountService = require('../account/accountService')
+const security = require('../../utils/security')
 
 const getCurrent = async (req, res, next) => {
   const account = await accountService.getAccountByUsername(req.auth.username)
