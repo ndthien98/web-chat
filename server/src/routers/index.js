@@ -1,7 +1,7 @@
-const auth = require('./auth/authRouter')
-const account = require('./account/accountRouter')
-const group = require('./group/groupRouter')
-const message = require('./message/messageRouter')
+const auth = require('./auth')
+const account = require('./account')
+const group = require('./group')
+const message = require('./message')
 
 module.exports = [
   {

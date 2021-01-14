@@ -24,7 +24,7 @@ app.use(notifySuccess)
 app.use(notifyFail)
 app.use(logger)
 
-const routers = require('./features')
+const routers = require('./routers')
 app.get('/api', (req, res) => res.send('API running'))
 routers.forEach(e => {
   app.use(e.path, e.router)
