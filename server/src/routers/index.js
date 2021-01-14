@@ -2,6 +2,7 @@ const auth = require('./auth')
 const account = require('./account')
 const group = require('./group')
 const message = require('./message')
+const media = require('./media')
 
 module.exports = [
   {
@@ -19,6 +20,10 @@ module.exports = [
   {
     path: '/message',
     router: message
+  },
+  {
+    path: '/media',
+    router: media
   },
   
 ]

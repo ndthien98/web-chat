@@ -9,5 +9,20 @@ router.post('/',
   tryCatch(groupController.createGroup)
 );
 
+router.get('/:groupid',
+  requireLogin,
+  tryCatch(groupController.getGroupById)
+);
+
+router.put('/name',
+  requireLogin,
+  tryCatch(groupController.updateGroupName)
+);
+
+router.put('/image',
+  requireLogin,
+  tryCatch(groupController.updateGroupImage)
+);
+
 
 module.exports = router

@@ -26,7 +26,6 @@ class Login extends Component {
     console.log('data', data)
     if (data) {
       Cookie.set('token', data.token)
-      Cookie.set('role', data.role)
       Cookie.set('userid', data.userid)
       this.props.history.push('/')
       noti.success('Đăng nhập thành công!')

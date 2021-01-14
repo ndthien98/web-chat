@@ -4,11 +4,15 @@ const security = require('../../utils/security')
 
 const getCurrent = async (req, res, next) => {
   const account = await accountService.getAccountByUsername(req.auth.username)
-  delete account.password;
-  res.send({
-    status: 1,
-    account
-  })
+  if (account) {
+    delete account.password;
+    res.send({
+      status: 1,
+      account
+    })
+  } else {
+    req.notifyFail("Không tìm thấy tài khoản")
+  }
 }
 const login = async (req, res, next) => {
   const { username, password } = req.body
@@ -22,12 +26,10 @@ const login = async (req, res, next) => {
       const user = await accountService.getAccountByUsername(username)
       const token = security.generateToken({
         userid: user.userid,
-        username: user.username,
-        role: user.role
+        username: user.username
       })
       res.send({
         userid: user.userid,
-        role: user.role,
         token
       })
     } else {

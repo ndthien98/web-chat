@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS account;
 CREATE TABLE account(
-`userid` char(36) NOT NULL,
+`userid` varchar(36) NOT NULL,
 `username` nvarchar(100) NOT NULL,
 `password` nvarchar(100) NOT NULL,
 `displayname` nvarchar(100) NOT NULL,
@@ -15,7 +15,7 @@ PRIMARY KEY (userid,username)
 
 DROP TABLE IF EXISTS `group`;
 CREATE TABLE `group`(
-  `groupid` char(36) NOT NULL,
+  `groupid` varchar(36) NOT NULL,
   `groupname` nvarchar(100) NOT NULL,
   `group_image` nvarchar(200) DEFAULT 'https://thebusinesscore.com/wp-content/themes/community-builder/assets/images/avatars/group-default-avatar.png',
   `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -25,7 +25,7 @@ CREATE TABLE `group`(
 
 DROP TABLE IF EXISTS `groupdetail`;
 CREATE TABLE `groupdetail`(
-  `groupid` char(36) NOT NULL,
+  `groupid` varchar(36) NOT NULL,
   `userid` varchar(36) NOT NULL,
   `join_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -36,11 +36,13 @@ CREATE TABLE `groupdetail`(
 
 DROP TABLE IF EXISTS `message`;
 CREATE TABLE `message`(
-  `messageid` char(36) NOT NULL,
-  `type` nchar(100) DEFAULT 'TEXT',
+  `messageid` varchar(36) NOT NULL,
+  `type` nvarchar(100) DEFAULT 'TEXT',
   `content` nvarchar(1000) NOT NULL,
-  `sender` char(36) NOT NULL,
-  `groupid` char(36) NOT NULL,
+  `sender` varchar(36) NOT NULL,
+  `groupid` varchar(36) NOT NULL,
+  `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (sender) REFERENCES account(userid),
   FOREIGN KEY (groupid) REFERENCES `group`(groupid)
 );

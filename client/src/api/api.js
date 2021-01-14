@@ -70,7 +70,6 @@ var axios = (function () {
               .catch((err) => {
                 Cookie.remove('token')
                 Cookie.remove('refreshToken')
-                Cookie.remove('role')
                 isRefreshing = false;
                 window.location = '/';
               });

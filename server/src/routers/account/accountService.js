@@ -15,7 +15,7 @@ const createAccount = async (username, displayname, birthday, gender, phone) => 
 const getAccountByUsername = async (username) => {
   const sql = `SELECT * FROM account WHERE username = ?;`
   const account = await db.queryOne(sql, [username]);
-  delete account.password
+  if (account) delete account.password
   return account
 }
 const updateAccountByUsername = async ({ username, displayname, birthday, gender, phone }) => {
@@ -43,9 +43,19 @@ const findAccount = async (keyword) => {
   return accounts
 }
 
+const updateAvatar = async (username, avatar) => {
+  const sql = `
+  UPDATE account
+  SET 
+    avatar = ?
+  WHERE username = ?;
+  `;
+  await db.queryNone(sql, [avatar, username])
+}
 module.exports = {
   createAccount,
   getAccountByUsername,
   updateAccountByUsername,
-  findAccount
+  findAccount,
+  updateAvatar
 }

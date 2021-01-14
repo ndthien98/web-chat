@@ -56,7 +56,6 @@ export default class Sidebar extends Component {
               onClick={() => {
                 Cookie.remove('token');
                 Cookie.remove('refreshToken');
-                Cookie.remove('role');
                 window.location = '/'
               }}
               style={{ marginTop: 50 }}
