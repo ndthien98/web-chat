@@ -3,19 +3,20 @@ const express = require('express')
 const http = require('http')
 const socketInit = require('./sockets')
 const path = require('path')
+
 // middlewares
 const JSONBodyParser = require('body-parser').json()
 const corsMiddlware = require('cors')()
 const catchException = require('./middlewares/errorHandle').catchException
 const notifySuccess = require('./middlewares/success').notifySuccess
 const notifyFail = require('./middlewares/success').notifyFail
+
+// utilities 
 const logger = require('./middlewares/logger')
 const security = require('./utils/security')
 
-require('dotenv').config()
-require('./utils/mysqldb')
-
-// routers
+require('dotenv').config() // init config from .env file 
+require('./utils/mysqldb') // init database connection 
 
 // Initialized RESTful API
 const app = express()
@@ -27,17 +28,19 @@ app.use(notifySuccess)
 app.use(notifyFail)
 app.use(logger)
 
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// static serve file in upload
+app.use('/api/media', express.static(path.join(__dirname, '../uploads')));
 
 const routers = require('./routers')
 app.get('/api', (req, res) => res.send('API running'))
 
 routers.forEach(e => {
-  app.use('/api' + e.path, e.router)
+  app.use(`/api${e.path}`, e.router)
   console.log(e.path)
 })
 
 app.use(catchException)
+
 app.use('*', (req, res) => { req.notifyFail('Unknown router: ' + req.originalUrl) })
 
 // Initialized Socket Server 

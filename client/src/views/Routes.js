@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
-import Message from './Message/Message'
+import Dialog from './Message/Dialog'
 import Login from './Login/Login'
 import NotFound from './NotFound/NotFound'
 import ProtectRoute from '../components/ProtectedRoute'
@@ -16,7 +16,7 @@ export default class Routes extends Component {
           <ProtectRoute
             exact
             path="/"
-            component={Message}
+            component={Dialog}
           />
           <ProtectRoute
             exact
