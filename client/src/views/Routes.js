@@ -6,6 +6,7 @@ import NotFound from './NotFound/NotFound'
 import ProtectRoute from '../components/ProtectedRoute'
 import Register from './Register/Register'
 import Account from './Account/Account'
+import Search from './Search/Search'
 import ChangePassword from './ChangePassword/ChangePassword'
 
 export default class Routes extends Component {
@@ -22,6 +23,11 @@ export default class Routes extends Component {
             exact
             path="/account"
             component={Account}
+          />
+          <ProtectRoute
+            exact
+            path="/search"
+            component={Search}
           />
           <ProtectRoute
             exact

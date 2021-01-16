@@ -14,3 +14,23 @@ export const updateAccount = async ({ username, displayname, gender, phone, birt
     return false;
   }
 }
+
+export const findUserByUsername = async (username) => {
+  try {
+    const res = await api.getInstance()
+      .get(EndPoint.FIND_ACCOUNT + '?keyword=' + username)
+    return res.data;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const updateAvatar = async (avatar) => {
+  try {
+    const res = await api.getInstance()
+      .put(EndPoint.UPDATE_AVATAR, { avatar })
+    return res.data;
+  } catch (error) {
+    return false;
+  }
+}

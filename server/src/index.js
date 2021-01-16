@@ -26,10 +26,10 @@ app.use(corsMiddlware)
 app.use(JSONBodyParser)
 app.use(notifySuccess)
 app.use(notifyFail)
-app.use(logger)
+// app.use(logger)
 
 // static serve file in upload
-app.use('/api/media', express.static(path.join(__dirname, '../uploads')));
+app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
 
 const routers = require('./routers')
 app.get('/api', (req, res) => res.send('API running'))

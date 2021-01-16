@@ -5,7 +5,8 @@ import { List, ListItem, Button, Paper } from '@material-ui/core';
 import {
   Settings as SettingIcon,
   AccountCircle as AccountIcon,
-  Message as MessageIcon
+  Message as MessageIcon,
+  Search as SearchIcon
 } from '@material-ui/icons';
 import Cookie from 'js-cookie'
 
@@ -24,6 +25,11 @@ export default class Sidebar extends Component {
         icon: <MessageIcon />,
       },
       {
+        title: 'Tìm kiếm',
+        href: '/search',
+        icon: <SearchIcon />,
+      },
+      {
         title: 'Thông tin cá nhân',
         href: '/account',
         icon: <AccountIcon />,
@@ -37,11 +43,17 @@ export default class Sidebar extends Component {
   }
   render() {
     return (
-      <Paper style={{height: '100%'}}>
-        <List>
+      <Paper style={{ height: '100%' }}>
+        <List style={{ height: '100%' }}>
           {this.pages.map((page) => (
             <ListItem disableGutters key={page.title}>
               <Button
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-start'
+                }}
                 component={CustomRouterLink}
                 to={page.href}
               >

@@ -1,7 +1,7 @@
+import EndPoint from './EndPoint'
 const Axios = require('axios')
 const Qs = require('qs')
 const Cookie = require('js-cookie')
-
 var axios = (function () {
   var instance;
   let isRefreshing = false;
@@ -15,7 +15,7 @@ var axios = (function () {
   };
   function init() {
     const instance = Axios.create({
-      baseURL: process.env.REACT_APP_API_BASE_URL,
+      baseURL: EndPoint.BASE_URL,
     });
     instance.interceptors.request.use(
       (request) => {

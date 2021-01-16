@@ -9,7 +9,7 @@ export default (function () {
     console.log('init socket client')
     instance = io(SOCKET_URL, {
       auth: {
-        token: Cookie.get('token')+1
+        token: Cookie.get('token')
       },
       reconnection: false
     });
