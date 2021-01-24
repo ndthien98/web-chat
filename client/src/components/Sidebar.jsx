@@ -21,7 +21,7 @@ export default class Sidebar extends Component {
     this.pages = [
       {
         title: 'Tin nhắn',
-        href: '/',
+        href: '/message',
         icon: <MessageIcon />,
       },
       {
@@ -31,7 +31,7 @@ export default class Sidebar extends Component {
       },
       {
         title: 'Thông tin cá nhân',
-        href: '/account',
+        href: '/',
         icon: <AccountIcon />,
       },
       {

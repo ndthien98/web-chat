@@ -3,6 +3,7 @@ import { Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Cookie from 'js-cookie';
 import Sidebar from '../components/Sidebar';
+import ContactList from '../views/Message/Contact'
 const ProtectRoute = (props) => {
   const { component: Component, ...rest } = props;
 
@@ -11,13 +12,17 @@ const ProtectRoute = (props) => {
       <div style={{ display: 'flex', flex: 1, height: '100%' }}>
         <Sidebar></Sidebar>
       </div>
-      <div style={{ display: 'flex', flex: 4 }}>
+      <div style={{ display: 'flex', flex: 2 }}>
+      
         <Route
           {...rest}
           render={(matchProps) =>
             Cookie.get('token') ? <Component {...matchProps} /> : <Redirect to="/login" />
           }
         />
+      </div>
+      <div style={{display:'flex',flex:1}}>
+        <ContactList></ContactList>
       </div>
     </div>
   );

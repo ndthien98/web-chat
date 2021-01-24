@@ -14,7 +14,7 @@ export default class Register extends Component {
       username: '',
       password: '',
       displayname: '',
-      birthday: null,
+      birthday: new Date().toISOString().slice(0, 10),
       phone: '',
       gender: ''
     }
