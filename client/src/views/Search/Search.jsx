@@ -1,5 +1,5 @@
-import { InputBase, IconButton, Divider } from '@material-ui/core'
-import { Search as SearchIcon } from '@material-ui/icons'
+import { InputBase, IconButton, Divider, Card, CardMedia, TextField, Typography, CardActions, Button } from '@material-ui/core'
+import { Search as SearchIcon, Add } from '@material-ui/icons'
 
 import React, { Component } from 'react'
 import api from '../../api'
@@ -9,13 +9,13 @@ export default class Search extends Component {
     super(props)
     this.state = {
       inputtext: '',
-      accounts: []
+      account: []
     }
   }
   handleSeach = async () => {
     if (this.state.inputtext.trim().length > 0) {
       const data = await api.account.findUserByUsername(this.state.inputtext)
-      this.setState({ accounts: data })
+      this.setState({ account: data })
     }
   }
   render() {
@@ -46,9 +46,32 @@ export default class Search extends Component {
             <SearchIcon />
           </IconButton>
         </div>
-        <div>
-          <h3>search result: {JSON.stringify(this.state.accounts)}</h3>
-        </div>
+
+        {
+          this.state.account.map(e => {
+            return <Card style={{
+              display: 'flex',
+              flexDirection: 'row',
+              margin: 24
+            }}>
+              <CardMedia image={e.avatar} style={{ height: 100, width: 100, margin: 8 }}>
+
+              </CardMedia>
+              <Typography style={{ margin: 8, width: 500 }} variant="h6">
+                {e.displayname}
+              </Typography>
+              <CardActions>
+                <Button style={{ margin: 8, width: 200 }} onClick={() => {
+                  this.props.history.push(`/message/${e.username}`)
+                }}>
+                  Nhắn tin
+                  </Button>
+              </CardActions>
+
+            </Card>
+          })
+        }
+
       </div>
     )
   }

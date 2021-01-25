@@ -19,7 +19,7 @@ export const findUserByUsername = async (username) => {
   try {
     const res = await api.getInstance()
       .get(EndPoint.FIND_ACCOUNT + '?keyword=' + username)
-    return res.data;
+    return res.data.account;
   } catch (error) {
     return false;
   }

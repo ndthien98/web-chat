@@ -43,7 +43,7 @@ export default class Sidebar extends Component {
   }
   render() {
     return (
-      <Paper style={{ height: '100%' }}>
+      <Paper style={{ height: '100%', width: 300 }}>
         <List style={{ height: '100%' }}>
           {this.pages.map((page) => (
             <ListItem disableGutters key={page.title}>
