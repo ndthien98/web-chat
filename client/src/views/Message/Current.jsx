@@ -11,6 +11,7 @@ export default class Current extends Component {
     return (
       <div style={{ width: '100%' }}>
         message with: {this.state.username}
+        
       </div>
     )
   }
