@@ -46,9 +46,7 @@ export default class TestSocket extends Component {
       });
     });
   };
-  componentWillUnmount = () => {
-    socketInstance.clearInstance();
-  };
+  
   handleSend = () => {
     if (this.state.inputtext.trim().length > 0) {
       socketInstance

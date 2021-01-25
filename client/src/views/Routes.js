@@ -16,6 +16,11 @@ export default class Routes extends Component {
         <Switch>
           <ProtectRoute
             exact
+            path="/message"
+            component={Dialog}
+          />
+          <ProtectRoute
+            exact
             path="/message/:id"
             component={Dialog}
           />

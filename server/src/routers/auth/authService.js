@@ -6,8 +6,8 @@ const checkExist = async (username) => {
   return result.length > 0
 }
 const createAccount = async ({ username, password, displayname, birthday, gender, phone }) => {
-  const sql = `INSERT INTO account(userid, username, password, displayname, birthday, gender, phone) VALUE(uuid(),?,?,?,?,?,?)`;
-  await db.queryNone(sql, [username, password, displayname, new Date(birthday), gender, phone]);
+  const sql = `INSERT INTO account(userid, username, password, displayname, birthday, gender, phone, avatar) VALUE(uuid(),?,?,?,?,?,?,?)`;
+  await db.queryNone(sql, [username, password, displayname, new Date(birthday), gender, phone,'/uploads/default.png']);
   return true
 }
 const getEncryptPassword = async (username) => {

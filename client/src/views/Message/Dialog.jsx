@@ -15,8 +15,13 @@ export default class Dialog extends Component {
 
   render() {
     return (
-      <div>
-        <TestSocket />
+      <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+        <div style={{ display: 'flex', flex: 5, flexDirection: 'row' }}>
+          <Current></Current>
+        </div>
+        <div style={{ display: 'flex', flex: 2, flexDirection: 'row' }}>
+          <Contact></Contact>
+        </div>
       </div>
     )
   }

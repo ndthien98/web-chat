@@ -32,6 +32,7 @@ app.use(notifyFail)
 app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
 
 const routers = require('./routers')
+const { check } = require('express-validator')
 app.get('/api', (req, res) => res.send('API running'))
 
 routers.forEach(e => {

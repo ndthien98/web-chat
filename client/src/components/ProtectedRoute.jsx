@@ -12,7 +12,7 @@ const ProtectRoute = (props) => {
       <div style={{ display: 'flex', height: '100%' }}>
         <Sidebar></Sidebar>
       </div>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', width: '100%' }}>
         <Route
           {...rest}
           render={(matchProps) =>

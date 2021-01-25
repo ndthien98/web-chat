@@ -3,6 +3,7 @@ import { Search as SearchIcon, Add } from '@material-ui/icons'
 
 import React, { Component } from 'react'
 import api from '../../api'
+import EndPoint from '../../api/EndPoint'
 
 export default class Search extends Component {
   constructor(props) {
@@ -54,7 +55,7 @@ export default class Search extends Component {
               flexDirection: 'row',
               margin: 24
             }}>
-              <CardMedia image={e.avatar} style={{ height: 100, width: 100, margin: 8 }}>
+              <CardMedia image={EndPoint.BASE_URL + e.avatar} style={{ height: 100, width: 100, margin: 8 }}>
 
               </CardMedia>
               <Typography style={{ margin: 8, width: 500 }} variant="h6">
@@ -67,7 +68,6 @@ export default class Search extends Component {
                   Nhắn tin
                   </Button>
               </CardActions>
-
             </Card>
           })
         }
