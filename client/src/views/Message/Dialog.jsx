@@ -1,4 +1,4 @@
-import { Button, Grid, Typography } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import React, { Component } from 'react'
 import Image from 'material-ui-image';
 import { FilePicker } from 'react-file-picker';
@@ -14,7 +14,6 @@ import { AttachFile, Send } from '@material-ui/icons';
 import socketInstance from '../../socket';
 import api from '../../api';
 import { withRouter } from 'react-router-dom';
-
 
 class Dialog extends Component {
   constructor(props) {
@@ -34,19 +33,11 @@ class Dialog extends Component {
     }
     this.messagesEndRef = React.createRef()
   }
+  
   componentDidMount = async () => {
     // get all contacts 
     const contacts = await api.account.getAllAccounts()
     await this.setState({ contacts })
-    if (this.props.location.userid !== null) {
-      for (let i = 0; i < this.state.length; i++) {
-        if (this.props.location.userid === this.state.contacts[i].userid) {
-          console.log('found',i)
-          await this.handleChangeContact(i);
-          break
-        }
-      }
-    }
     const messages = await api.message.getAllMessage(this.state.contacts[this.state.index].userid)
     if (messages) {
       await this.setState({ messages })
@@ -73,21 +64,26 @@ class Dialog extends Component {
 
   handleSend = async () => {
     if (this.state.inputtext.trim() === '') return;
+
     const newMessage = {
       sender: Cookie.get('userid'),
       receiver: this.state.contacts[this.state.index].userid,
       content: this.state.inputtext,
       type: 'TEXT'
     }
+
     socketInstance.getInstance().emit('new-message', newMessage)
+
     await this.setState({
       inputtext: '',
       messages: [...this.state.messages, newMessage]
     })
+
     this.messagesEndRef.current.scrollIntoView()
   }
+
   handleAttachFile = async (image) => {
-    console.log(image)
+    
     const formData = new FormData();
     formData.append('image', image);
     const { link } = await api.media.uploadFile(formData)
@@ -104,6 +100,7 @@ class Dialog extends Component {
       inputtext: '',
       messages: [...this.state.messages, newMessage]
     })
+
     this.messagesEndRef.current.scrollIntoView()
   }
   render() {
@@ -158,9 +155,6 @@ class Dialog extends Component {
                 <FilePicker
                   extensions={['jpg', 'jpeg', 'png']}
                   onChange={this.handleAttachFile}
-                  onError={() => {
-
-                  }}
                 >
                   <IconButton>
                     <AttachFile />
@@ -173,9 +167,10 @@ class Dialog extends Component {
                   }}
                   placeholder='Nhập tin nhắn'
                   value={this.state.inputtext}
+                  onKeyDown={(e) => (e.key === 'Enter' ? this.handleSend() : 1)}
                 />
                 <Divider orientation='vertical' />
-                <IconButton color='primary' onClick={this.handleSend} onKeyPress={(event) => event.keyCode === 13 ? this.handleSend() : null}>
+                <IconButton color='primary' onClick={this.handleSend}>
                   <Send />
                 </IconButton>
               </div>

@@ -10,28 +10,24 @@ module.exports = (socketServer) => {
     console.log('client connected', socketClient.userid)
     console.log(onlineUser.map(e => e.userid))
 
-    socketClient.on('disconnect', data => {
+    socketClient.on('disconnect', () => { // a b c d
       onlineUser = onlineUser.filter(userSocket => userSocket.userid !== socketClient.userid)
       console.log('client disconnect')
     })
 
     socketClient.on('new-message', async newMessage => {
       await messageService.createMessage(newMessage)
+
       onlineUser.forEach((e, i) => {
-        console.log('id:' + i + e.userid)
         if (e.userid === newMessage.receiver) {
           e.emit('new-message', newMessage)
         }
       })
+
       console.log('on:new-message:', newMessage)
     })
+
   })
 
-  // gửi tin nhắn cho group
-  // check người dùng trong group xem có ai online hay không 
-  // online - gửi tin nhắn cho mọi người
-  // offline - lưu tin nhắn lại
-
-
-  // lưu tin nhắn vào database 
 }
+
