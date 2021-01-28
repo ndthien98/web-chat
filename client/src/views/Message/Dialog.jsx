@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core'
+import { Button, Typography } from '@material-ui/core'
 import React, { Component } from 'react'
 import Image from 'material-ui-image';
 import { FilePicker } from 'react-file-picker';
@@ -14,11 +14,13 @@ import {
   Send,
   Image as AttachImageIcon,
   Movie as AttachVideoIcon,
-  Audiotrack as AttachAudioIcon
+  Audiotrack as AttachAudioIcon,
+  AttachFile as AttachFileIcon
 } from '@material-ui/icons';
 import socketInstance from '../../socket';
 import api from '../../api';
 import { withRouter } from 'react-router-dom';
+import noti from '../../components/Notificator'
 
 class Dialog extends Component {
   constructor(props) {
@@ -31,10 +33,12 @@ class Dialog extends Component {
         birthday: '',
         phone: '',
         avatar: '',
-        online: false
+        online: false,
+        hasNewMess: false
       }],
       inputtext: '',
       index: 0,
+      typing: false,
       messages: []
     }
     this.messagesEndRef = React.createRef()
@@ -43,7 +47,15 @@ class Dialog extends Component {
   componentDidMount = async () => {
     // get all contacts 
     const contacts = await api.account.getAllAccounts()
-    await this.setState({ contacts: contacts.map(e => ({ ...e, online: false })) })
+    await this.setState({
+      contacts: contacts.map(e => {
+        return {
+          ...e,
+          online: false,
+          hasNewMess: false
+        }
+      })
+    })
 
     // get old messages
     const messages = await api.message.getAllMessage(this.state.contacts[this.state.index].userid)
@@ -55,26 +67,47 @@ class Dialog extends Component {
     // init socket 
     await socketInstance.clearInstance()
     socketInstance.getInstance().on('new-message', async (data) => {
-      await this.setState({
-        messages: [...this.state.messages, data]
-      })
-      this.messagesEndRef.current.scrollIntoView()
+      if (data.sender === this.state.contacts[this.state.index].userid) {
+        await this.setState({
+          messages: [...this.state.messages, data]
+        })
+        this.messagesEndRef.current.scrollIntoView()
+      } else {
+        this.setState({
+          contacts: this.state.contacts.map(e => {
+            return {
+              ...e,
+              hasNewMess: data.sender === e.userid ? true : e.hasNewMess
+            }
+          })
+        })
+      }
     })
 
+    // get list of current online user 
     socketInstance.getInstance().on('online-user', (data) => {
       this.setState({
-        contacts: this.state.contacts.map(e => ({
-          ...e,
-          online: data.indexOf(e.userid) !== -1
-        }))
+        contacts: this.state.contacts.map(e => {
+          return {
+            ...e,
+            online: data.indexOf(e.userid) !== -1
+          }
+        })
       })
     })
-
+    // someone online
     socketInstance.getInstance().on('join', (userid) => {
       this.handleOnlineUser(userid, true)
     })
+    // someone offline
     socketInstance.getInstance().on('leave', (userid) => {
       this.handleOnlineUser(userid, false)
+    })
+    // buzz
+    socketInstance.getInstance().on('buzz', (userid) => {
+      this.state.contacts.forEach(e => {
+        if (e.userid === userid) noti.info(e.displayname + ' vừa buzz bạn!!')
+      })
     })
   }
   handleOnlineUser = (userid, status) => {
@@ -89,7 +122,15 @@ class Dialog extends Component {
   }
   handleChangeContact = async (index) => {
     // get messages 
-    await this.setState({ index })
+    await this.setState({
+      index,
+      contacts: this.state.contacts.map(e => {
+        return {
+          ...e,
+          hasNewMess: false
+        }
+      })
+    })
     const messages = await api.message.getAllMessage(this.state.contacts[index].userid)
     if (messages) this.setState({ messages })
     this.messagesEndRef.current.scrollIntoView()
@@ -136,6 +177,9 @@ class Dialog extends Component {
 
     this.messagesEndRef.current.scrollIntoView()
   }
+  sendBuzz = () => {
+    socketInstance.getInstance().emit('buzz', this.state.contacts[this.state.index].userid)
+  }
   renderMessage = (message) => {
     switch (message.type) {
       case 'TEXT':
@@ -150,13 +194,16 @@ class Dialog extends Component {
         return <video controls>
           <source src={process.env.REACT_APP_API_BASE_URL + message.content} type="video/mp4"></source>
         </video>
+      case 'FILE':
+        const arr = message.content.split('/')
+        return <p><a href={process.env.REACT_APP_API_BASE_URL + message.content}>{arr[arr.length - 1]}</a></p>
       default:
         return <p>{message.content}</p>
     }
   }
   render() {
     return (
-      <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }} >
         <div style={{ display: 'flex', flex: 5, flexDirection: 'row', width: '100%' }}>
           <div style={{ width: '100%' }}>
             <div style={{ flexDirection: 'column', display: 'flex', width: '100%', height: '100%' }}>
@@ -164,7 +211,9 @@ class Dialog extends Component {
                 <Card style={{ height: 50, width: 50 }}>
                   <Image src={process.env.REACT_APP_API_BASE_URL + this.state.contacts[this.state.index].avatar}></Image>
                 </Card>
-                <Typography>{this.state.contacts[this.state.index].displayname}</Typography>
+                <Typography style={{ flex: 1, marginLeft: 8 }}>{this.state.contacts[this.state.index].displayname}</Typography>
+                <Button variant="outlined" color="secondary" dense
+                  onClick={this.sendBuzz}>Buzz!!</Button>
               </div>
               <div style={{
                 height: '100%',
@@ -192,12 +241,13 @@ class Dialog extends Component {
                 </div>)
                 }
                 <div ref={this.messagesEndRef} />
+
               </div>
               < div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                 <FilePicker
                   extensions={['jpg', 'jpeg', 'png']}
                   onChange={this.handleAttachFile('IMAGE')}
-                  onError={alert}
+                  onError={(msg) => noti.error(msg)}
                 >
                   <IconButton>
                     <AttachImageIcon />
@@ -206,7 +256,7 @@ class Dialog extends Component {
                 <FilePicker
                   extensions={['mp3', 'wav']}
                   onChange={this.handleAttachFile('AUDIO')}
-                  onError={alert}
+                  onError={(msg) => noti.error(msg)}
                 >
                   <IconButton>
                     <AttachAudioIcon />
@@ -214,7 +264,7 @@ class Dialog extends Component {
                 </FilePicker>
                 <FilePicker
                   extensions={['mp4']}
-                  onError={alert}
+                  onError={(msg) => noti.error(msg)}
                   onChange={this.handleAttachFile('VIDEO')}
                   maxSize={200}
                 >
@@ -222,6 +272,17 @@ class Dialog extends Component {
                     <AttachVideoIcon />
                   </IconButton>
                 </FilePicker>
+
+                <FilePicker
+                  onChange={this.handleAttachFile('FILE')}
+                  maxSize={200}
+                  onError={(msg) => noti.error(msg)}
+                >
+                  <IconButton>
+                    <AttachFileIcon />
+                  </IconButton>
+                </FilePicker>
+
                 <InputBase
                   style={{ width: '100%' }}
                   onChange={(event) => {
@@ -275,17 +336,17 @@ class Dialog extends Component {
                 <Card style={{ height: 50, width: 60 }}>
                   <Image src={process.env.REACT_APP_API_BASE_URL + obj.avatar}></Image>
                 </Card>
-                <div style={{ width: 10, height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <div style={{ width: 10, height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 4 }}>
                   <div style={{ width: 10, height: 10, borderRadius: 5, background: obj.online ? 'green' : 'gray' }} />
                 </div>
                 <div style={{ width: '100%', paddingLeft: '4%' }}>
-                  <Typography>{obj.displayname}</Typography>
+                  <Typography>{obj.displayname}{obj.hasNewMess ? ' (có tin nhắn mới) ' : ''}</Typography>
                 </div>
               </Box>
             ))}
           </div>
         </div>
-      </div>
+      </div >
     )
   }
 }

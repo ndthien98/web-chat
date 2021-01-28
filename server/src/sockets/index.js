@@ -16,7 +16,7 @@ module.exports = (socketServer) => {
       userSocket.emit('join', socketClient.userid)
     })
 
-    socketClient.on('disconnect', () => { // a b c d
+    socketClient.on('disconnect', () => {
       onlineUser = onlineUser.filter(userSocket => userSocket.userid !== socketClient.userid)
       onlineUser.forEach(userSocket => {
         userSocket.emit('leave', socketClient.userid)
@@ -33,6 +33,12 @@ module.exports = (socketServer) => {
         }
       })
       console.log('on:new-message:', newMessage)
+    })
+
+    socketClient.on('buzz', userid => {
+      onlineUser.forEach(userSocket => {
+        if (userSocket.userid === userid) userSocket.emit('buzz', socketClient.userid)
+      })
     })
 
   })
