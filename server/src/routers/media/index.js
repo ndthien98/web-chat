@@ -6,7 +6,7 @@ const tryCatch = require('../../middlewares/errorHandle').tryCatch
 
 router.put('/upload',
   requireLogin,
-  upload.single('image'),
+  upload.single('file'),
   tryCatch(mediaService.uploadImage)
 );
 

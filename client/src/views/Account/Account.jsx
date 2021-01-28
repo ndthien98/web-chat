@@ -61,7 +61,7 @@ export default class Account extends Component {
   }
   handleUploadAvatar = async (avatar) => {
     const data = new FormData();
-    data.append('image', avatar);
+    data.append('file', avatar);
     const result = await api.media.uploadFile(data);
     console.log(result)
     const result2 = await api.account.updateAvatar(result.link)

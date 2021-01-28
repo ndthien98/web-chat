@@ -10,7 +10,12 @@ import {
   Card,
   Box
 } from '@material-ui/core';
-import { AttachFile, Send } from '@material-ui/icons';
+import {
+  Send,
+  Image as AttachImageIcon,
+  Movie as AttachVideoIcon,
+  Audiotrack as AttachAudioIcon
+} from '@material-ui/icons';
 import socketInstance from '../../socket';
 import api from '../../api';
 import { withRouter } from 'react-router-dom';
@@ -25,7 +30,8 @@ class Dialog extends Component {
         gender: '',
         birthday: '',
         phone: '',
-        avatar: ''
+        avatar: '',
+        online: false
       }],
       inputtext: '',
       index: 0,
@@ -33,11 +39,13 @@ class Dialog extends Component {
     }
     this.messagesEndRef = React.createRef()
   }
-  
+
   componentDidMount = async () => {
     // get all contacts 
     const contacts = await api.account.getAllAccounts()
-    await this.setState({ contacts })
+    await this.setState({ contacts: contacts.map(e => ({ ...e, online: false })) })
+
+    // get old messages
     const messages = await api.message.getAllMessage(this.state.contacts[this.state.index].userid)
     if (messages) {
       await this.setState({ messages })
@@ -53,9 +61,34 @@ class Dialog extends Component {
       this.messagesEndRef.current.scrollIntoView()
     })
 
-  }
+    socketInstance.getInstance().on('online-user', (data) => {
+      this.setState({
+        contacts: this.state.contacts.map(e => ({
+          ...e,
+          online: data.indexOf(e.userid) !== -1
+        }))
+      })
+    })
 
+    socketInstance.getInstance().on('join', (userid) => {
+      this.handleOnlineUser(userid, true)
+    })
+    socketInstance.getInstance().on('leave', (userid) => {
+      this.handleOnlineUser(userid, false)
+    })
+  }
+  handleOnlineUser = (userid, status) => {
+    this.setState({
+      contacts: this.state.contacts.map(e => {
+        return {
+          ...e,
+          online: e.userid === userid ? status : e.online
+        }
+      })
+    })
+  }
   handleChangeContact = async (index) => {
+    // get messages 
     await this.setState({ index })
     const messages = await api.message.getAllMessage(this.state.contacts[index].userid)
     if (messages) this.setState({ messages })
@@ -82,17 +115,17 @@ class Dialog extends Component {
     this.messagesEndRef.current.scrollIntoView()
   }
 
-  handleAttachFile = async (image) => {
-    
+  handleAttachFile = (type) => async (file) => {
+    console.log(file)
     const formData = new FormData();
-    formData.append('image', image);
+    formData.append('file', file);
     const { link } = await api.media.uploadFile(formData)
 
     const newMessage = {
       sender: Cookie.get('userid'),
       receiver: this.state.contacts[this.state.index].userid,
       content: link,
-      type: 'IMAGE'
+      type: type
     }
 
     socketInstance.getInstance().emit('new-message', newMessage)
@@ -103,12 +136,30 @@ class Dialog extends Component {
 
     this.messagesEndRef.current.scrollIntoView()
   }
+  renderMessage = (message) => {
+    switch (message.type) {
+      case 'TEXT':
+        return <p>{message.content}</p>
+      case 'IMAGE':
+        return <img style={{ height: 200, width: 200 }} src={process.env.REACT_APP_API_BASE_URL + message.content} alt="img" />
+      case 'AUDIO':
+        return <audio controls>
+          <source src={process.env.REACT_APP_API_BASE_URL + message.content} type="audio/mpeg"></source>
+        </audio>
+      case 'VIDEO':
+        return <video controls>
+          <source src={process.env.REACT_APP_API_BASE_URL + message.content} type="video/mp4"></source>
+        </video>
+      default:
+        return <p>{message.content}</p>
+    }
+  }
   render() {
     return (
       <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
         <div style={{ display: 'flex', flex: 5, flexDirection: 'row', width: '100%' }}>
           <div style={{ width: '100%' }}>
-            <div style={{ flexDirection: 'column', display: 'flex', paddingTop: '10%', width: '100%', height: '100%' }}>
+            <div style={{ flexDirection: 'column', display: 'flex', width: '100%', height: '100%' }}>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', margin: 8 }}>
                 <Card style={{ height: 50, width: 50 }}>
                   <Image src={process.env.REACT_APP_API_BASE_URL + this.state.contacts[this.state.index].avatar}></Image>
@@ -118,7 +169,7 @@ class Dialog extends Component {
               <div style={{
                 height: '100%',
                 width: '100%',
-                backgroundColor: 'gray',
+                backgroundColor: 'white',
                 overflow: 'auto'
               }}>
                 {this.state.messages.map((e, i) => <div
@@ -134,18 +185,9 @@ class Dialog extends Component {
                       margin: 4,
                       paddingLeft: 10,
                       paddingRight: 10,
-                      backgroundColor: e.receiver === this.state.contacts[this.state.index].userid ? 'cyan' : 'white',
+                      backgroundColor: e.type === 'TEXT' ? (e.receiver === this.state.contacts[this.state.index].userid ? 'cyan' : 'gray') : 'white',
                     }}>
-                    {e.type === 'TEXT'
-                      ? <p>{e.content}</p>
-                      : <img
-                        style={{
-                          height: 200,
-                          width: 200,
-                        }}
-                        src={process.env.REACT_APP_API_BASE_URL + e.content}
-                        alt="img"
-                      />}
+                    {this.renderMessage(e)}
                   </div>
                 </div>)
                 }
@@ -154,10 +196,30 @@ class Dialog extends Component {
               < div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
                 <FilePicker
                   extensions={['jpg', 'jpeg', 'png']}
-                  onChange={this.handleAttachFile}
+                  onChange={this.handleAttachFile('IMAGE')}
+                  onError={alert}
                 >
                   <IconButton>
-                    <AttachFile />
+                    <AttachImageIcon />
+                  </IconButton>
+                </FilePicker>
+                <FilePicker
+                  extensions={['mp3', 'wav']}
+                  onChange={this.handleAttachFile('AUDIO')}
+                  onError={alert}
+                >
+                  <IconButton>
+                    <AttachAudioIcon />
+                  </IconButton>
+                </FilePicker>
+                <FilePicker
+                  extensions={['mp4']}
+                  onError={alert}
+                  onChange={this.handleAttachFile('VIDEO')}
+                  maxSize={200}
+                >
+                  <IconButton>
+                    <AttachVideoIcon />
                   </IconButton>
                 </FilePicker>
                 <InputBase
@@ -213,6 +275,9 @@ class Dialog extends Component {
                 <Card style={{ height: 50, width: 60 }}>
                   <Image src={process.env.REACT_APP_API_BASE_URL + obj.avatar}></Image>
                 </Card>
+                <div style={{ width: 10, height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 5, background: obj.online ? 'green' : 'gray' }} />
+                </div>
                 <div style={{ width: '100%', paddingLeft: '4%' }}>
                   <Typography>{obj.displayname}</Typography>
                 </div>

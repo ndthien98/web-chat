@@ -5,13 +5,22 @@ let onlineUser = []
 
 module.exports = (socketServer) => {
   socketServer.on('connection', (socketClient) => {
-    
+
     onlineUser.push(socketClient)
     console.log('client connected', socketClient.userid)
     console.log(onlineUser.map(e => e.userid))
 
+    socketClient.emit('online-user', onlineUser.map(e => e.userid))
+
+    onlineUser.forEach(userSocket => {
+      userSocket.emit('join', socketClient.userid)
+    })
+
     socketClient.on('disconnect', () => { // a b c d
       onlineUser = onlineUser.filter(userSocket => userSocket.userid !== socketClient.userid)
+      onlineUser.forEach(userSocket => {
+        userSocket.emit('leave', socketClient.userid)
+      })
       console.log('client disconnect')
     })
 
@@ -23,11 +32,9 @@ module.exports = (socketServer) => {
           e.emit('new-message', newMessage)
         }
       })
-
       console.log('on:new-message:', newMessage)
     })
 
   })
-
 }
 
