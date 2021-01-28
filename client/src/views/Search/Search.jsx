@@ -62,7 +62,10 @@ export default class Search extends Component {
               </Typography>
               <CardActions>
                 <Button style={{ margin: 8, width: 200 }} onClick={() => {
-                  this.props.history.push(`/message/${e.username}`)
+                  this.props.history.push({
+                    pathname:'message',
+                    userid: e.userid
+                  })
                 }}>
                   Nhắn tin
                   </Button>

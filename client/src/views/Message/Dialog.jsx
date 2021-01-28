@@ -1,7 +1,7 @@
 import { Button, Grid, Typography } from '@material-ui/core'
 import React, { Component } from 'react'
 import Image from 'material-ui-image';
-
+import { FilePicker } from 'react-file-picker';
 import Cookie from 'js-cookie';
 import {
   InputBase,
@@ -13,8 +13,10 @@ import {
 import { AttachFile, Send } from '@material-ui/icons';
 import socketInstance from '../../socket';
 import api from '../../api';
+import { withRouter } from 'react-router-dom';
 
-export default class Dialog extends Component {
+
+class Dialog extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -36,7 +38,16 @@ export default class Dialog extends Component {
     // get all contacts 
     const contacts = await api.account.getAllAccounts()
     await this.setState({ contacts })
-    const messages = await api.message.getAllMessage(this.state.contacts[0].userid)
+    if (this.props.location.userid !== null) {
+      for (let i = 0; i < this.state.length; i++) {
+        if (this.props.location.userid === this.state.contacts[i].userid) {
+          console.log('found',i)
+          await this.handleChangeContact(i);
+          break
+        }
+      }
+    }
+    const messages = await api.message.getAllMessage(this.state.contacts[this.state.index].userid)
     if (messages) {
       await this.setState({ messages })
       this.messagesEndRef.current.scrollIntoView()
@@ -57,10 +68,11 @@ export default class Dialog extends Component {
     await this.setState({ index })
     const messages = await api.message.getAllMessage(this.state.contacts[index].userid)
     if (messages) this.setState({ messages })
-
+    this.messagesEndRef.current.scrollIntoView()
   }
 
   handleSend = async () => {
+    if (this.state.inputtext.trim() === '') return;
     const newMessage = {
       sender: Cookie.get('userid'),
       receiver: this.state.contacts[this.state.index].userid,
@@ -74,15 +86,34 @@ export default class Dialog extends Component {
     })
     this.messagesEndRef.current.scrollIntoView()
   }
+  handleAttachFile = async (image) => {
+    console.log(image)
+    const formData = new FormData();
+    formData.append('image', image);
+    const { link } = await api.media.uploadFile(formData)
 
+    const newMessage = {
+      sender: Cookie.get('userid'),
+      receiver: this.state.contacts[this.state.index].userid,
+      content: link,
+      type: 'IMAGE'
+    }
+
+    socketInstance.getInstance().emit('new-message', newMessage)
+    await this.setState({
+      inputtext: '',
+      messages: [...this.state.messages, newMessage]
+    })
+    this.messagesEndRef.current.scrollIntoView()
+  }
   render() {
     return (
       <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
         <div style={{ display: 'flex', flex: 5, flexDirection: 'row', width: '100%' }}>
           <div style={{ width: '100%' }}>
             <div style={{ flexDirection: 'column', display: 'flex', paddingTop: '10%', width: '100%', height: '100%' }}>
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <Card style={{ height: 50, width: 60 }}>
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', margin: 8 }}>
+                <Card style={{ height: 50, width: 50 }}>
                   <Image src={process.env.REACT_APP_API_BASE_URL + this.state.contacts[this.state.index].avatar}></Image>
                 </Card>
                 <Typography>{this.state.contacts[this.state.index].displayname}</Typography>
@@ -108,16 +139,33 @@ export default class Dialog extends Component {
                       paddingRight: 10,
                       backgroundColor: e.receiver === this.state.contacts[this.state.index].userid ? 'cyan' : 'white',
                     }}>
-                    <p>{e.content}</p>
+                    {e.type === 'TEXT'
+                      ? <p>{e.content}</p>
+                      : <img
+                        style={{
+                          height: 200,
+                          width: 200,
+                        }}
+                        src={process.env.REACT_APP_API_BASE_URL + e.content}
+                        alt="img"
+                      />}
                   </div>
                 </div>)
                 }
                 <div ref={this.messagesEndRef} />
               </div>
               < div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                <IconButton onClick={this.handleAttachFile}>
-                  <AttachFile />
-                </IconButton>
+                <FilePicker
+                  extensions={['jpg', 'jpeg', 'png']}
+                  onChange={this.handleAttachFile}
+                  onError={() => {
+
+                  }}
+                >
+                  <IconButton>
+                    <AttachFile />
+                  </IconButton>
+                </FilePicker>
                 <InputBase
                   style={{ width: '100%' }}
                   onChange={(event) => {
@@ -182,3 +230,4 @@ export default class Dialog extends Component {
   }
 }
 
+export default withRouter(Dialog);
