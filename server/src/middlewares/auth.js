@@ -2,6 +2,7 @@ const security = require('../utils/security')
 
 const requireLogin = async (req, res, next) => {
   try {
+    console.log('chạy qua auth')
     const token = req.headers.authorization.split(` `)[1]; // `Bearer thiehtiheithie`
     const decodedToken = security.verifyToken(token);
     req.auth = decodedToken;

@@ -21,11 +21,6 @@ export default class Routes extends Component {
           />
           <ProtectRoute
             exact
-            path="/message/:id"
-            component={Dialog}
-          />
-          <ProtectRoute
-            exact
             path="/"
             component={Account}
           />

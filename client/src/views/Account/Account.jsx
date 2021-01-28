@@ -9,14 +9,13 @@ import {
   Grid,
   Button,
   TextField,
-  Typography
+  Typography,
+  Select,
+  MenuItem
 } from '@material-ui/core';
-import styles from './Account.style'
 import api from '../../api';
 import noti from '../../components/Notificator';
 import { FilePicker } from 'react-file-picker';
-import { enqueueSnackbar } from 'notistack'
-import EndPoint from '../../api/EndPoint';
 
 export default class Account extends Component {
   constructor(props) {
@@ -67,7 +66,6 @@ export default class Account extends Component {
     console.log(result)
     const result2 = await api.account.updateAvatar(result.link)
     await this.componentDidMount();
-    console.log('result2', 'http://localhost:9000/api' + this.state.user.avatar)
   }
   render() {
     return (
@@ -89,7 +87,7 @@ export default class Account extends Component {
               width: 200,
               margin: 16,
             }}
-            src={EndPoint.BASE_URL + this.state.user.avatar}
+            src={process.env.REACT_APP_API_BASE_URL + this.state.user.avatar}
             alt="avatar"
           />
           <CardActions>
@@ -140,15 +138,17 @@ export default class Account extends Component {
             </Grid>
             <Grid item md={6} xs={12}>
               <Typography>Giới tính</Typography>
-              <TextField
+              <Select
                 fullWidth
                 margin="dense"
                 name="gender"
                 onChange={this.handleChange}
                 required
                 value={this.state.user.gender}
-                variant="outlined"
-              />
+              >
+                <MenuItem value={1}>Nam</MenuItem>
+                <MenuItem value={2}>Nữ</MenuItem>
+              </Select>
             </Grid>
             <Grid item md={6} xs={12}>
               <Typography>Số điện thoại</Typography>

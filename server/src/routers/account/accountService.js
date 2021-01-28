@@ -52,10 +52,20 @@ const updateAvatar = async (username, avatar) => {
   `;
   await db.queryNone(sql, [avatar, username])
 }
+
+const getAllAccount = async () => {
+  const sql = `SELECT * FROM account`;
+  const accounts = await db.queryMulti(sql);
+  accounts.forEach((_,index) => {
+    delete accounts[index].password
+  });
+  return accounts
+}
 module.exports = {
   createAccount,
   getAccountByUsername,
   updateAccountByUsername,
   findAccount,
-  updateAvatar
+  updateAvatar,
+  getAllAccount
 }

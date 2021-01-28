@@ -1,10 +1,9 @@
 import api from './api'
-import EndPoint from './EndPoint'
 
 export const login = async ({ username, password }) => {
   try {
     const res = await api.getInstance()
-      .post(EndPoint.LOGIN, {
+      .post('/auth/login/', {
         username, password
       })
     return res.data;
@@ -17,7 +16,7 @@ export const register = async ({ username, password, displayname, gender, phone,
   try {
     const res = await api.getInstance()
       .post(
-        EndPoint.REGISTER,
+        '/auth/register/',
         { username, password, displayname, gender, phone, birthday }
       )
     return res.data;
@@ -29,7 +28,7 @@ export const register = async ({ username, password, displayname, gender, phone,
 export const getCurrent = async () => {
   try {
     const res = await api.getInstance()
-      .get(EndPoint.GET_CURRENT_USER)
+      .get('/auth/current/')
     return res.data;
   } catch (error) {
     return false;
@@ -40,7 +39,7 @@ export const changePassword = async ({ password, newpassword, repassword }) => {
   try {
     const res = await api.getInstance()
       .post(
-        EndPoint.CHANGE_PASSWORD,
+        '/auth/change-password/',
         { password, newpassword, repassword }
       )
     return res.data;

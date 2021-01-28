@@ -28,7 +28,8 @@ export default {
     return instance;
   },
   clearInstance: function () {
-    instance.removeAllListeners();
+    if (instance)
+      instance.removeAllListeners();
     instance = null;
   }
 };

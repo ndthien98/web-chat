@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card, Typography } from '@material-ui/core';
+
 export default class MessageItem extends Component {
   constructor(props) {
     super(props);

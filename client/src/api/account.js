@@ -1,12 +1,10 @@
-import noti from '../components/Notificator'
 import api from './api'
-import EndPoint from './EndPoint'
 
 export const updateAccount = async ({ username, displayname, gender, phone, birthday }) => {
   try {
     const res = await api.getInstance()
       .put(
-        EndPoint.UPDATE_ACCOUNT + username,
+        '/account/' + username,
         { displayname, gender, phone, birthday }
       )
     return res.data;
@@ -18,7 +16,7 @@ export const updateAccount = async ({ username, displayname, gender, phone, birt
 export const findUserByUsername = async (username) => {
   try {
     const res = await api.getInstance()
-      .get(EndPoint.FIND_ACCOUNT + '?keyword=' + username)
+      .get('/account/find?keyword=' + username)
     return res.data.account;
   } catch (error) {
     return false;
@@ -28,8 +26,28 @@ export const findUserByUsername = async (username) => {
 export const updateAvatar = async (avatar) => {
   try {
     const res = await api.getInstance()
-      .put(EndPoint.UPDATE_AVATAR, { avatar })
+      .put('/account/avatar', { avatar })
     return res.data;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const getAllAccounts = async () => {
+  try {
+    const res = await api.getInstance()
+      .get('/account/all')
+    return res.data.accounts;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const getAccountByUsername = async (username) => {
+  try {
+    const res = await api.getInstance()
+      .get('/account/' + username)
+    return res.data.account;
   } catch (error) {
     return false;
   }

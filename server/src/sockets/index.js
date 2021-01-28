@@ -1,13 +1,12 @@
 
 const security = require('../utils/security')
-
+const messageService = require('../routers/message/messageService')
 let onlineUser = []
 
 module.exports = (socketServer) => {
   socketServer.on('connection', (socketClient) => {
-
+    
     onlineUser.push(socketClient)
-
     console.log('client connected', socketClient.userid)
     console.log(onlineUser.map(e => e.userid))
 
@@ -16,10 +15,15 @@ module.exports = (socketServer) => {
       console.log('client disconnect')
     })
 
-    socketClient.on('new-message', data => {
-      socketClient.emit('new-message', 'socket: ' + data)
-      // socketServer.emit('new-message', 'socket: ' + data)
-      console.log('on:new-message:', data)
+    socketClient.on('new-message', async newMessage => {
+      await messageService.createMessage(newMessage)
+      onlineUser.forEach((e, i) => {
+        console.log('id:' + i + e.userid)
+        if (e.userid === newMessage.receiver) {
+          e.emit('new-message', newMessage)
+        }
+      })
+      console.log('on:new-message:', newMessage)
     })
   })
 

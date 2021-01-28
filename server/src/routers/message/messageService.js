@@ -1,22 +1,16 @@
 const db = require('../../utils/mysqldb')
 
-const getMessageById = async (messageid) => {
-  const sql = "SELECT * FROM message WHERE messageid = ?;"
-  return await db.queryOne(sql, [messageid])
+const getMessageBetween = async (sender, receiver) => {
+  const sql = `SELECT * FROM message WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) `;
+  const messages = await db.queryMulti(sql, [sender, receiver, receiver, sender])
+  return messages
 }
 
-const getMessageOfGroup = async (groupid) => {
-  const sql = "SELECT * FROM message WHERE groupid = ? ORDER BY update_time DESC;"
-  return await db.queryMulti(sql, [groupid])
+const createMessage = async (message) =>{
+  const sql = `INSERT INTO message(messageid, sender, receiver, content, type) value(uuid(), ? , ? , ? , ? )`
+  await db.queryNone(sql,[message.sender, message.receiver, message.content, message.type ])
 }
-
-const getLastMessageOfGroup = async (groupid) => {
-  const sql = "SELECT * FROM message WHERE groupid = ? ORDER BY update_time DESC LIMIT 1;"
-  return await db.queryOne(sql, [groupid])
-}
-
 module.exports = {
-  getMessageById,
-  getMessageOfGroup,
-  getLastMessageOfGroup
+  getMessageBetween,
+  createMessage
 }

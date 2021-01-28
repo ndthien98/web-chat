@@ -9,6 +9,11 @@ router.get('/find',
   tryCatch(accountController.findAccount)
 );
 
+router.get('/all',
+  requireLogin,
+  tryCatch(accountController.getAllAccount)
+);
+
 router.put('/avatar',
   requireLogin,
   validators('avatar'),

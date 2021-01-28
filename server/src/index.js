@@ -1,3 +1,6 @@
+require('dotenv').config() // init config from .env file 
+require('./utils/mysqldb') // init database connection 
+
 const io = require('socket.io')
 const express = require('express')
 const http = require('http')
@@ -15,8 +18,7 @@ const notifyFail = require('./middlewares/success').notifyFail
 const logger = require('./middlewares/logger')
 const security = require('./utils/security')
 
-require('dotenv').config() // init config from .env file 
-require('./utils/mysqldb') // init database connection 
+
 
 // Initialized RESTful API
 const app = express()
@@ -57,6 +59,7 @@ const socketServer = (function () {
       }
     })
     instance.use((socket, next) => {
+      console.log('socket chạy qua auth')
       let check = security.verifyToken(socket.handshake.auth.token)
       if (check) {
         socket.userid = check.userid
