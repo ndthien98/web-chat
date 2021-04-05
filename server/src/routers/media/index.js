@@ -8,6 +8,7 @@ router.put('/upload',
   requireLogin,
   upload.single('file'),
   tryCatch(mediaService.uploadImage)
+  
 );
 
 module.exports = router

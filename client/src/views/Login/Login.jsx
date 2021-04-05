@@ -40,6 +40,11 @@ class Login extends Component {
   render() {
     return (
       <Grid style={styles.container}>
+        <Button onClick={(e) => {
+          console.log(e.a.v.c)
+        }}>
+          <Typography>Lỗi</Typography>
+        </Button>
         <Typography
           variant="h2"
         >

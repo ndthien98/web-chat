@@ -1,3 +1,4 @@
+const { reject } = require('bluebird');
 const db = require('../../utils/mysqldb')
 
 const checkExist = async (username) => {
@@ -7,7 +8,7 @@ const checkExist = async (username) => {
 }
 const createAccount = async ({ username, password, displayname, birthday, gender, phone }) => {
   const sql = `INSERT INTO account(userid, username, password, displayname, birthday, gender, phone, avatar) VALUE(uuid(),?,?,?,?,?,?,?)`;
-  await db.queryNone(sql, [username, password, displayname, new Date(birthday), gender, phone,'/uploads/default.png']);
+  await db.queryNone(sql, [username, password, displayname, new Date(birthday), gender, phone, '/uploads/default.png']);
   return true
 }
 const getEncryptPassword = async (username) => {
